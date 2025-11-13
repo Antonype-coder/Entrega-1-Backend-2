@@ -2,7 +2,6 @@ import express from "express";
 import User from "../../models/user.js";
 import { authenticate } from "../../middlewares/auth.js";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 
 const router = express.Router();
 
@@ -18,15 +17,25 @@ router.post("/register", async (req, res) => {
       return res.send("Faltan datos obligatorios");
     }
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return res.send("Usuario ya existe");
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.send("El email ya está registrado");
+    }
 
-    const newUser = new User({ first_name, last_name, email, age, password });
-    await newUser.save();
+    const user = new User({ 
+      first_name, 
+      last_name, 
+      email: email.toLowerCase(), 
+      age, 
+      password 
+    });
+    await user.save();
+
     res.redirect("/users/login");
+
   } catch (error) {
-    console.error("Error al registrar usuario:", error.message);
-    res.status(500).send("Error al registrar usuario");
+    console.error("Error en registro:", error);
+    res.send("Error al registrar usuario");
   }
 });
 
@@ -37,27 +46,48 @@ router.get("/login", (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+
+    const user = await User.findOne({ email: email.toLowerCase() });
     if (!user || !user.comparePassword(password)) {
       return res.redirect("/users/login");
     }
 
     const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
+      { id: user._id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "24h" }
     );
 
-    res.cookie("currentUser", token, { httpOnly: true });
+    res.cookie("currentUser", token, { 
+      signed: true,
+      httpOnly: true
+    });
+
     res.redirect("/users/current");
+
   } catch (error) {
+    console.error("Error en login:", error);
     res.redirect("/users/login");
   }
 });
 
 router.get("/current", authenticate, async (req, res) => {
-  const user = await User.findById(req.user.id).lean();
-  res.render("current", { user });
+  try {
+    const user = await User.findById(req.user.id).lean();
+
+    if (!user) {
+      return res.redirect("/users/login");
+    }
+
+    res.render("current", { 
+      user: user,
+      title: "Mi Perfil"
+    });
+
+  } catch (error) {
+    console.error("Error al obtener perfil:", error);
+    res.redirect("/users/login");
+  }
 });
 
 router.get("/logout", (req, res) => {

@@ -1,7 +1,14 @@
-<h1>Iniciar Sesión</h1>
+<h2>Iniciar Sesión</h2>
+
+{{#if error}}
+<div class="alert alert-danger">
+  Email o contraseña incorrectos
+</div>
+{{/if}}
+
 <form action="/users/login" method="POST">
-  <input type="email" name="email" placeholder="Correo" required>
-  <input type="password" name="password" placeholder="Contraseña" required>
-  <button type="submit">Entrar</button>
+    <input class="form-control mb-2" type="email" name="email" placeholder="Email" required>
+    <input class="form-control mb-2" type="password" name="password" placeholder="Contraseña" required>
+    <button class="btn btn-success w-100" type="submit">Entrar</button>
 </form>
-<a href="/users/register">Registrarse</a>
+<a href="/users/register" class="btn btn-link w-100">¿No tienes cuenta? Regístrate</a>

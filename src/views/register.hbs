@@ -1,10 +1,10 @@
-<h1>Registro de Usuario</h1>
+<h2>Registrarse</h2>
 <form action="/users/register" method="POST">
-  <input type="text" name="first_name" placeholder="Nombre" required>
-  <input type="text" name="last_name" placeholder="Apellido" required>
-  <input type="email" name="email" placeholder="Correo" required>
-  <input type="number" name="age" placeholder="Edad">
-  <input type="password" name="password" placeholder="Contraseña" required>
-  <button type="submit">Registrarse</button>
+    <input class="form-control mb-2" type="text" name="first_name" placeholder="Nombre" required>
+    <input class="form-control mb-2" type="text" name="last_name" placeholder="Apellido" required>
+    <input class="form-control mb-2" type="email" name="email" placeholder="Email" required>
+    <input class="form-control mb-2" type="number" name="age" placeholder="Edad">
+    <input class="form-control mb-2" type="password" name="password" placeholder="Contraseña" required>
+    <button class="btn btn-primary w-100" type="submit">Registrarse</button>
 </form>
-<a href="/users/login">Iniciar sesión</a>
+<a href="/users/login" class="btn btn-link w-100">¿Ya tienes cuenta? Login</a>

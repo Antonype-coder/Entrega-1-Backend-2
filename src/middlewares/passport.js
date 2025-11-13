@@ -8,11 +8,11 @@ passport.use('local', new LocalStrategy({
   passwordField: 'password'
 }, async (email, password, done) => {
   try {
-    const user = await User.findOne({ email });
-    if (!user) return done(null, false, { message: 'Usuario no encontrado' });
+    const user = await User.findOne({ email: email.toLowerCase() });
     
-    const isMatch = user.comparePassword(password);
-    if (!isMatch) return done(null, false, { message: 'Contraseña incorrecta' });
+    if (!user || !user.comparePassword(password)) {
+      return done(null, false, { message: 'Credenciales incorrectas' });
+    }
     
     return done(null, user);
   } catch (error) {
@@ -23,7 +23,10 @@ passport.use('local', new LocalStrategy({
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromExtractors([
     (req) => {
-      return req.signedCookies?.currentUser;
+      return req.signedCookies?.currentUser || 
+             req.cookies?.currentUser ||
+             (req.headers.authorization?.startsWith('Bearer ') ? 
+              req.headers.authorization.substring(7) : null);
     }
   ]),
   secretOrKey: process.env.JWT_SECRET
@@ -31,19 +34,8 @@ const jwtOptions = {
 
 passport.use('jwt', new JwtStrategy(jwtOptions, async (payload, done) => {
   try {
-    const user = await User.findById(payload.id).select('-password');
-    if (!user) return done(null, false);
-    return done(null, user);
-  } catch (error) {
-    return done(error, false);
-  }
-}));
-
-passport.use('current', new JwtStrategy(jwtOptions, async (payload, done) => {
-  try {
-    const user = await User.findById(payload.id).select('-password');
-    if (!user) return done(null, false, { message: 'Usuario no encontrado' });
-    return done(null, user);
+    const user = await User.findById(payload.id);
+    return user ? done(null, user) : done(null, false);
   } catch (error) {
     return done(error, false);
   }
