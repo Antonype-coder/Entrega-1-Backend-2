@@ -39,7 +39,7 @@ app.use("/users", usersViewRoutes);
 app.get("/", (req, res) => {
   res.send(`
     <div style="padding: 20px; text-align: center;">
-      <h1>🚀 Sistema de Usuarios</h1>
+      <h1>Sistema de Usuarios</h1>
       <p><a href="/users/register">Registrarse</a> | <a href="/users/login">Login</a></p>
     </div>
   `);
