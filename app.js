@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-dotenv.config();
+dotenv.config(); // 👈 PRIMERO SIEMPRE
 
 import express from "express";
 import cookieParser from "cookie-parser";
@@ -19,23 +19,29 @@ import passport from "./src/middlewares/passport.js";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Conexión a MongoDB
 connectDB();
 
+// Configuración de Handlebars
 app.engine("hbs", exphbs.engine({ extname: ".hbs" }));
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "src/views"));
 
+// Middlewares
 app.use(cookieParser(process.env.JWT_SECRET));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
+// Passport
 app.use(passport.initialize());
 
+// Rutas
 app.use("/api/users", usersApiRoutes);
 app.use("/api/sessions", sessionsApiRoutes);
 app.use("/users", usersViewRoutes);
 
+// Página principal
 app.get("/", (req, res) => {
   res.send(`
     <div style="padding: 20px; text-align: center;">
@@ -45,6 +51,7 @@ app.get("/", (req, res) => {
   `);
 });
 
+// Servidor
 app.listen(PORT, () => {
   console.log(`✅ Servidor en http://localhost:${PORT}`);
 });
