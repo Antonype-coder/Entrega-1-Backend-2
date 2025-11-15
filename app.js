@@ -1,6 +1,8 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import exphbs from "express-handlebars";
@@ -14,7 +16,6 @@ import sessionsApiRoutes from "./src/routes/api/sessions.js";
 import usersViewRoutes from "./src/routes/views/user.js";
 import passport from "./src/middlewares/passport.js";
 
-dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -25,7 +26,6 @@ app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "src/views"));
 
 app.use(cookieParser(process.env.JWT_SECRET));
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
